@@ -1,0 +1,163 @@
+# GPe-STN model with delyed synaptic currents to
+# test their effects on bursting profiles of STN.
+# DBS added to check how these bursting profiles
+# respond to ut in the presence of delayed currents.
+
+############### STN Params
+
+p Els=-60,Enas=55.,Eks=-80.,Ecas=140.
+p gls=2.25,gnas=37.5,gks=45,gahps=12.,gcas=.5,gts=.5
+p thetam=30,sigmam=15
+p thetah=-39,sigmah=3.1,sigmaht=3.1
+p thetan=-32.,sigman=-8.,sigmant=26.
+p thetar=-67,sigmar=2.,sigmart=2.2
+p thetas=39.,sigmas=8.
+p thetaa=-63.,sigmaa=-7.8
+p taun0=1,taun1=100.
+p tauh0=1,tauh1=500
+p taur0=7.1,taur1=17.5
+p tn=1.,th=0.05,
+p thh=57.,phir=.5
+p thr=-68,thn=80.,phi=.75,
+p kca=22.5,k1=15.,eps=5e-05
+
+############### GPe Params
+
+p Elg=-55.,Enag=55.,Ekg=-80.,Ecag=120.
+p glg=.1,gnag=120.,gkg=30.,gcag=.1,gahpg=30.,gtg=.5
+p thetamg=-37.,sigmamg=10.
+p thetahg=-58,sigmahg=-12
+p thetang=-50.,sigmang=14.
+p thetarg=-70.,sigmarg=-2.,taurg=30.
+p thetasg=-35.,sigmasg=2.
+p thetaag=-57.,sigmaag=2.
+p taun0g=.05,taun1g=.27
+p tauh0g=.05,tauh1g=.27
+p thetangt=-40,sigmangt=-12
+p thetahgt=-40,sigmahgt=-12
+p phig=1.,phing=.05,phihg=.05
+p kcag=20.,k1g=30.,epsg=0.0001
+
+############### Synapses Params
+
+p iapp=-1.2
+
+p tau=2,tau1=1
+p gGtoS=1,EGtoS=-100
+p gGtoG=0.04,EGtoG=-100.
+p gStoG=0.018,EStoG=0
+
+p alphag=2,betag=.08,abg=-20
+p alpha=5,beta=1.,ab=-30.
+p thetab=.25,sigmab=-.07
+
+p f=150,amp=5,dur=0.06
+p tstim=400,tpause=400,cycle=800
+
+p xp=1.,i=0.
+
+############### STN Funcs
+
+hv(v)=1/(1+exp(-v))
+
+sinf(v)=1/(1+exp(-(v+thetas)/sigmas))
+minf(v)=1/(1+exp(-(v+thetam)/sigmam))
+hinf(v)=1/(1+exp((v-thetah)/sigmah))
+ninf(v)=1/(1+exp((v-thetan)/sigman))
+taun(v)=taun0+taun1/(1+exp((v+thn)/sigmant))
+tauh(v)=tauh0+tauh1/(1+exp((v+thh)/sigmaht))
+rinf(v)=1/(1+exp((v-thetar)/sigmar))
+taur(v)=taur0+taur1/(1+exp((v+thr)/sigmart))
+ainf(v)=1/(1+exp((v-thetaa)/sigmaa))
+binf(r)=1/(1+exp((r-thetab)/sigmab))-1/(1+exp(-thetab/sigmab))
+
+############### GPe Funcs
+
+ainfg(v)=1/(1+exp(-(v-thetaag)/sigmaag))
+sinfg(v)=1/(1+exp(-(v-thetasg)/sigmasg))
+rinfg(v)=1/(1+exp(-(v-thetarg)/sigmarg))
+minfg(v)=1/(1+exp(-(v-thetamg)/sigmamg))
+ninfg(v)=1/(1+exp(-(v-thetang)/sigmang))
+taung(v)=taun0g+taun1g/(1+exp(-(v-thetangt)/sigmangt))
+hinfg(v)=1/(1+exp(-(v-thetahg)/sigmahg))
+tauhg(v)=tauh0g+tauh1g/(1+exp(-(v-thetahgt)/sigmahgt))
+
+############### STN Currs
+
+il(v)=gls*(v-Els)
+ina(v,h)=gnas*(minf(v))^3*h*(v-Enas)
+ik(v,n)=gks*n^4*(v-Eks)
+iahp(v,ca)=gahps*(v-Eks)*ca/(ca+k1)
+ica(v)=gcas*((sinf(v))^2)*(v-Ecas)
+it(v,r)=gts*(ainf(v)**3)*(binf(r)^2)*(v-Ecas)
+
+############### GPe Currs
+
+itg(vg,rg)=gtg*(ainfg(vg)^3)*rg*(vg-Ecag)
+inag(vg,hg)=gnag*(minfg(vg)^3)*hg*(vg-Enag)
+ikg(vg,ng)=gkg*(ng^4)*(vg-Ekg)
+iahpg(vg,cag)=gahpg*(vg-Ekg)*cag/(cag+k1g)
+icag(vg)=gcag*((sinfg(vg))^2)*(vg-Ecag)
+ilg(vg)=glg*(vg-Elg)
+
+############### GPe to STN Syn Currs
+
+isyn1=gGtoS*(delay(sg9,tau1)+delay(sg10,tau1)+delay(sg1,tau1)+delay(sg2,tau1)+delay(sg3,tau1))*(v1-EGtoS)
+isyn2=gGtoS*(delay(sg10,tau1)+delay(sg1,tau1)+delay(sg2,tau1)+delay(sg3,tau1)+delay(sg4,tau1))*(v2-EGtoS)
+isyn3=gGtoS*(delay(sg1,tau1)+delay(sg2,tau1)+delay(sg3,tau1)+delay(sg4,tau1)+delay(sg5,tau1))*(v3-EGtoS)
+isyn4=gGtoS*(delay(sg2,tau1)+delay(sg3,tau1)+delay(sg4,tau1)+delay(sg5,tau1)+delay(sg6,tau1))*(v4-EGtoS)
+isyn5=gGtoS*(delay(sg3,tau1)+delay(sg4,tau1)+delay(sg5,tau1)+delay(sg6,tau1)+delay(sg7,tau1))*(v5-EGtoS)
+isyn6=gGtoS*(delay(sg4,tau1)+delay(sg5,tau1)+delay(sg6,tau1)+delay(sg7,tau1)+delay(sg8,tau1))*(v6-EGtoS)
+isyn7=gGtoS*(delay(sg5,tau1)+delay(sg6,tau1)+delay(sg7,tau1)+delay(sg8,tau1)+delay(sg9,tau1))*(v7-EGtoS)
+isyn8=gGtoS*(delay(sg6,tau1)+delay(sg7,tau1)+delay(sg8,tau1)+delay(sg9,tau1)+delay(sg10,tau1))*(v8-EGtoS)
+isyn9=gGtoS*(delay(sg7,tau1)+delay(sg8,tau1)+delay(sg9,tau1)+delay(sg10,tau1)+delay(sg1,tau1))*(v9-EGtoS)
+isyn10=gGtoS*(delay(sg8,tau1)+delay(sg9,tau1)+delay(sg10,tau1)+delay(sg1,tau1)+delay(sg2,tau1))*(v10-EGtoS)
+
+############### STN to GPe Syn Currs
+
+isyng1=gStoG*(delay(s10,tau)+delay(s1,tau)+delay(s2,tau))*(vg1-EStoG)
+isyng2=gStoG*(delay(s1,tau)+delay(s2,tau)+delay(s3,tau))*(vg2-EStoG)
+isyng3=gStoG*(delay(s2,tau)+delay(s3,tau)+delay(s4,tau))*(vg3-EStoG)
+isyng4=gStoG*(delay(s3,tau)+delay(s4,tau)+delay(s5,tau))*(vg4-EStoG)
+isyng5=gStoG*(delay(s4,tau)+delay(s5,tau)+delay(s6,tau))*(vg5-EStoG)
+isyng6=gStoG*(delay(s5,tau)+delay(s6,tau)+delay(s7,tau))*(vg6-EStoG)
+isyng7=gStoG*(delay(s6,tau)+delay(s7,tau)+delay(s8,tau))*(vg7-EStoG)
+isyng8=gStoG*(delay(s7,tau)+delay(s8,tau)+delay(s9,tau))*(vg8-EStoG)
+isyng9=gStoG*(delay(s8,tau)+delay(s9,tau)+delay(s10,tau))*(vg9-EStoG)
+isyng10=gStoG*(delay(s9,tau)+delay(s10,tau)+delay(s1,tau))*(vg10-EStoG)
+stot=sg1+sg2+sg3+sg4+sg5+sg6+sg7+sg8+sg9+sg10
+isyngg(vg,sg)=gGtoG*stot*(vg-EGtoG)
+
+############### STN Equs
+
+v[1..10]'=-(il(v[j])+ina(v[j],h[j])+ik(v[j],n[j])+iahp(v[j],ca[j])+ica(v[j])+it(v[j],r[j]))-isyn[j]+dbs(t)
+h[1..10]'=phi*( hinf(v[j])-h[j] )/tauh(v[j])
+n[1..10]'=phi*( ninf(v[j])-n[j] )/taun(v[j])
+r[1..10]'=phir*(rinf(v[j])-r[j])/taur(v[j])
+ca[1..10]'=phi*eps*(-ica(v[j])-it(v[j],r[j]) - kca*ca[j])
+s[1..10]'=alpha*(1-s[j])*sinf(v[j]+ab)-beta*s[j]
+
+
+############### GPe Equs
+
+vg[1..10]'= -(itg(vg[j],rg[j])+inag(vg[j],hg[j])+ikg(vg[j],ng[j])+iahpg(vg[j],cag[j])+icag(vg[j])+ilg(vg[j])) +iapp -isyngg(vg[j],stot)-isyng[j]
+ng[1..10]'= phing*(ninfg(vg[j])-ng[j])/taung(vg[j])
+hg[1..10]'= phihg*(hinfg(vg[j])-hg[j])/tauhg(vg[j])
+rg[1..10]'= phig*(rinfg(vg[j])-rg[j])/taurg
+cag[1..10]'=epsg*(-icag(vg[j])-itg(vg[j],rg[j]) - kcag*cag[j])
+sg[1..10]'=alphag*(1-sg[j])*sinfg(vg[j]+abg)-betag*sg[j]
+
+############### DBS Formula
+
+dbs(t)=amp*hv(sin(6.2831853*f*(t)/1000))*(1-hv(sin(6.2831853*f*(t+dur)/1000)))
+
+#### dbs(t)=amp*hv(sin(6.2831853*f*(t)/1000)) ####
+
+#### stim = if((t-flr(t/cycle)*cycle) < tstim)then(1)else(0) ####
+#### dbs(t)=amp*hv(sin(6.2831853*f*(t)/1000))*stim ####
+
+#### aux dbs_out=dbs(t) ####
+
+@ dt=.5,total=100000,meth=qualrk,xlo=0,xhi=100000,ylo=-100,yhi=40.,@ delay=5
+
+done
