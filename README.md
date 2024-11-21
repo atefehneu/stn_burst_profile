@@ -12,8 +12,8 @@ You can use this package for:
 
 *** Run the ‘.ode’ file after installing ‘XPPAUT’ to test how 
 bursting profiles of STN could be affected by synaptic delays.
-*** Run the script ‘.m’ files to see the figures are reported in our paper.
-***You can use the ‘.dat’ file to test our MATLAB ‘.m’ files.
+*** Run the script ‘.m’ file to see the figures are reported in our paper.
+***You can use the ‘.dat’ file to test our MATLAB ‘.m’ file.
 ***You can contact me if you have any questions and suggestions:
 Atefeh.asadi.neu@gmail.com
 
